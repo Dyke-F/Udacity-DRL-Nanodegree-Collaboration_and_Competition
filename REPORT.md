@@ -58,5 +58,7 @@ PRINT_EVERY = 100           # control statistics outputs
 
 ## 4. Outlook
 ### One mayor improvement might be to share observation spaces. Both agents critics might receive each opponents current observation space and (as this is a collaborative task) might help each other in finding an optimal action. As for instance agent1 is faced with an environment state that is has never seen before, agent2 might already have experienced this situation and share its knowlegde.
+
+Additional options
 - [Rainbow](https://arxiv.org/pdf/1710.02298.pdf): Rainbow networks apply several improvements over the classical DQN network and might help improving performance of the Critic's Q-value estimation.
 - [Monte Carlo Tree Search](https://science.sciencemag.org/content/362/6419/1140/tab-pdf): Currently, the TD3 model as implemented here only consides deciding on the next state based on the current state. In Monte Carlo Tree Search a parent tree with multiple leaf nodes can be created to expand looking into the future not only towards the next state, but towards n number of states in the future and deciding the current strategy based on possible favourable decisions that lay much further in the future.
