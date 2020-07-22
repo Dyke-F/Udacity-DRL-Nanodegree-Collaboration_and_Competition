@@ -3,6 +3,11 @@
 
 
 # Udacity-DRL-Nanodegree-Collaboration and Competition
+In this Unity ML environment, two agents control tennis rackets to bounce a ball over the net. Once an agent succesfully hits a ball to its opponent, it receives a reward of +0.1. A negative reward of -0.01 is given in case an agents either hits the ball out of bounds a lets it touch the ground. Therefore, both agents are inheritently prone to keep the ball in the match.
+
+The observation space is composed of eight variables, that include position of the ball, the agents racket and velocities and directions. Each agent obtains its own, local observation. The action space consists of two continous variables, which are movements (towards or away from the ball) and jump upwards.
+
+To complete the enviroment succesfully, the agents must receive an average score of +0.5 over 100 consecutive episodes, taking the maximum of both agents rewards at each timepoint.
 
 
 ![Trained Agent][image1]
