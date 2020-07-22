@@ -5,6 +5,7 @@
 # Udacity-DRL-Nanodegree-Collaboration and Competition
 
 
+![Trained Agent][image1]
 
 ### Getting Started
 
