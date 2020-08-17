@@ -1,63 +1,65 @@
 # Report
 
 ## 1. Deep Reinforcement Learning Architecture
-In this project, the TD3 algorithm is implemented to solve the continous control robot task.
+In this project, the DDPG algorithm is implemented to solve the collaboration and competition task.
 - Initialise a replay buffer (from the ReplayBuffer.py file) as the agents memory
 - Replay buffer holds BUFFER_SIZE number of training exploration and samples BATCH_SIZE number of these for learning iteratively at each step.
 - An online / local actor (policy) and critic (Q-value) network is initialized. 
 - Soft updates are used for adjusting the weight matrices in the corresponding actor and critic target networks
-### TD3 learning:
-  - TD3 is similar to DDPG learning, however stabilizes value estimations through generating two Q-networks (pair, thus the name Twin in TD3)
-  - TD3 moreover uses delayed updates of the actor networks (to guarantee stabilisation of the critic has occured before), which is controlled by the hyperparameter policy_freq in the TD3_Agent.py learn-function
-  - action noise regularisation is applied to compensate for lack of epsilon-greediness
+
 ### Training:
  - the agent is trained for n numbers of episodes with a max_t number of timesteps per one episode or ends before if reaching a terminal state (dones)
  - inside the training loop, the agent acts (randomly at the start), appends SARS' sequences to memory and learns from them
  
  ### Actor Architecture
- - input dimension = state_space = int 33
- - output dimension = action_space = int 4
- - network is composed of two hidden (with dimensions 400 and 300) and one final output layer (dimensions = actor space), all of them using nn.Linear()
+ - input dimension = state_space = int 24
+ - output dimension = action_space = int 2
+ - network is composed of two hidden (with dimensions 200 and 150) and one final output layer (dimensions = actor space), all of them using nn.Linear()
  - after the input layer, batch normalization is applied
  - for hidden layer, activation is relu, for output layer a tanh activation follows
  
 ### Critic Architecture
- - input dimension = state_space = int 33; first hidden layer returns 400 outputs
- - after the first hidden layer (input layer), state and action spaces are concatenated
- - second hidden layer sees 400 + action_size number of inputs; outputs = 300 nodes
- - after batch normalization, the final layer outputs a single value (Q-estimation)
+ - input dimension = state_space = int 24; first hidden layer returns 200 outputs
+ - in the first hidden layer (input layer), state and action spaces are concatenated -> it sees 24 + 2 (state_size + action_size) inputs
+ - second hidden layer sees 200  number of inputs; outputs = 150 nodes
  - for hidden layers, relu activation followed, final layer returns non-activated output
  
 ## 2. Hyperparamters
 ```
-### Network parameters
-FC1_UNITS = 400             # Number of neurons in the first hidden layer of Actor
-FCS1_UNITS = 400            # Number of neurons in the first hidden layer of Critic
-FC2_UNITS = 300             # Shared number of neurons for second hidden layer in both
+# Network params
+FC1_UNITS = 200         # first hidden layer number of nodes
+FC2_UNITS = 150         # second hidden layer number of nodes
 
-### Agent parameters
-BUFFER_SIZE = int(1e5)      # length of internal memory
-BATCH_SIZE = 256            # number of samples selected for each learning step
-GAMMA = 0.99                # discount factor
-TAU = 1e-3                  # control for soft updates
-LR_ACTOR = 2e-4             # Learning Rate for Actor
-LR_CRITIC = 2e-4            # Learning Rate for Critic
-WEIGHT_DECAY = 0            # weight_decay
-NOISE_DECAY = 0.999         # iteratively reduce noise 
+# Agent params
+BUFFER_SIZE = int(1e5)  # replay buffer size
+BATCH_SIZE = 256        # minibatch size
+GAMMA = 0.99            # discount factor
+TAU = 1e-3              # for soft update of target parameters
+LR_ACTOR = 1e-4         # learning rate of the actor
+LR_CRITIC = 1e-3        # learning rate of the critic 
+WEIGHT_DECAY = 0        # L2 weight decay
 
-### Training parameters
-N_EPISODES = 2000           # training iterations
-MAX_T = 10000               # maximum number of steps per episode
-PRINT_EVERY = 100           # control statistics outputs
+DELAY_UPDATE = 2        # target network update delay to ensure stabilisation before
+NOISE_DECAY = 0.9999    # reduce noise
+
+RANDOM_SEED = 0         # seed for reproducibility
+
+# Noise params
+MU = 0.                 # OUNoise parameter
+THETA = 0.15            # OUNoise parameter
+SIGMA = 0.2             # OUNoise parameter
+SCALE = 1               # OUNoise parameter
+
+# Training params       
+NUM_EPISODES = 1000     # number of training iterations     
+PRINT_EVERY = 100       # how often to print stats
 ```
 
 ## 3. Opinion
-![SingleScores](./Single_Agent_Score.png)
-
-### TD3 Learning appears to hold great promise in improving deep reinforcement learning techniques, as compared to many other algorithms to solve this task that I found online, it reaches a high quality policy very fast. Moreover, despite one single collapse around epoch 55-60 (from which the policy recovered immediately), it appears much more stable than classical DDPG or PPO solutions that I tried out in direct comparison and in the end achieves very stable results with average scores continously over 35. In parallel learning however it takes quite a while to execute, so although the total number of epochs to achieve a stable policy is much lower than in other algorithms, the high quality might go at the expense of higher training times.
+### Multi-Agent-Learning appears to be very unstable and several algorithms including PPO, and TD3 (that has shown suoerior results in many other tasks compared to DDPG) have failed while trying to implement them in this task. Setting the hyperparameters accordingly was the crucial point in this project, and auto-optimizing them with either grid search or services like Amazon Sagemaker's Hyperparameter Optimization Job might greatly enhance the performance of this model.
 
 ## 4. Outlook
-### One mayor improvement might be to share observation spaces. Both agents critics might receive each opponents current observation space and (as this is a collaborative task) might help each other in finding an optimal action. As for instance agent1 is faced with an environment state that is has never seen before, agent2 might already have experienced this situation and share its knowlegde.
+### One mayor improvement might be to share observation spaces. Both agents critics might receive each opponents current observation space and (as this is a collaborative task) might help each other in finding an optimal action. As for instance agent1 is faced with an environment state that is has never seen before, agent2 might already have experienced this situation and share its knowlegde. Other improvements like expected would be to include TD3-Learning or other advancements over DDPG, use Eperience Replay Buffer etc (most of these improvements are implemented in the Rainbow model, see below) and to use Monte Carlo Tree Search as well.
 
 Additional options
 - [Rainbow](https://arxiv.org/pdf/1710.02298.pdf): Rainbow networks apply several improvements over the classical DQN network and might help improving performance of the Critic's Q-value estimation.
